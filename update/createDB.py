@@ -1,8 +1,17 @@
-#create DataBase in JSON file in the format of:
-    # song_dict = {
-    #     "name": song_name,
-    #     "spectrogram_Hash": None,
-    #     "melspectrogram_Hash": None,
-    #     "mfcc_Hash": None,
-    #     "chroma_stft_Hash": None,
-    # } 
+import spectro_features
+import load
+import json
+import os
+
+def updateDB():
+    jsonData = {}
+    for file in os.scandir(r"songs"):
+        if (file.path.endswith(".mp3")):
+            sampRate, audioData = load.readAudio(file)
+            songName = file.path.split('\\')[-1]
+            data = spectro_features.Load_Song(songName, audioData, sampRate)
+            jsonData.update(data)
+    with open("db.json", "a") as outfile:
+        json.dump(jsonData, outfile, indent=4)
+
+updateDB()

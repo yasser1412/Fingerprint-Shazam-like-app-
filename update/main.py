@@ -2,13 +2,10 @@ from PyQt5 import QtWidgets, QtCore, uic, QtGui
 from PyQt5.QtWidgets import QMessageBox  
 from PyQt5.uic import loadUiType
 from os import path
-from scipy.io import wavfile
 import logging
 import sys
-import os
-from pydub import AudioSegment
-from tempfile import mktemp
 import spectro_features 
+import load
 
 logging.basicConfig(filename="logFile.log",format='%(asctime)s %(message)s',filemode='w')
 logger = logging.getLogger()
@@ -32,16 +29,6 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
         self.audioRates = [None, None]
         self.mixedSong = None
     
-    def readAudio(self, audiopath):
-        logger.info("Reading first minute of the mp3")
-        mp3_audio = AudioSegment.from_mp3(audiopath)[:60000] 
-        waveName = mktemp('.wav')
-        mp3_audio.export(waveName, format="wav", parameters=["-ac", "1"])
-        logger.info("Converted to wav")
-        samplingFreq, audioData = wavfile.read(waveName)
-        logger.info("Read wav format and return the data")
-        return samplingFreq, audioData
-    
     def loadsong(self , indx):
         self.statusbar.showMessage("Loading Audio File "+str(indx+1))
         global audFile
@@ -54,7 +41,7 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
         else:
             logger.info("Loading data")
             global sampRate , audioData
-            sampRate, audioData = self.readAudio(audFile)
+            sampRate, audioData = load.readAudio(audFile)
             self.audioDatas[indx] = audioData 
             self.audioRates[indx] = sampRate
             self.labels[indx].setText(audFile.split('/')[-1])
