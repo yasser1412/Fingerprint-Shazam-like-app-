@@ -69,13 +69,18 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
             self.slider.setEnabled(True)
     
     def mixer(self):
-        logger.info("Start Mixing 2 songs")
         w = self.slider.value()/100.0
-        self.mixedAudioData = (w*self.audioDatas[0] + (1.0-w)*self.audioDatas[1])
-        logger.info("Mixing Done")
         
         logger.info("Load Hash")
-        self.mixedSong = spectro_features.Load_Song("Loaded Song", self.mixedAudioData, self.audioRates[0])
+        if self.flag1 == True and self.flag2 == False:
+            self.mixedSong = spectro_features.Load_Song("Loaded Song", self.audioDatas[0], self.audioRates[0])
+        if self.flag1 == False and self.flag2 == True:
+            self.mixedSong = spectro_features.Load_Song("Loaded Song", self.audioDatas[1], self.audioRates[1])
+        if self.flag1 == self.flag2 == True: 
+            logger.info("Start Mixing 2 songs")
+            self.mixedAudioData = (w*self.audioDatas[0] + (1.0-w)*self.audioDatas[1])
+            self.mixedSong = spectro_features.Load_Song("Loaded Song", self.mixedAudioData, self.audioRates[0])
+            logger.info("Mixing Done")
         print(self.mixedSong)
     
     #TODO Funcs.
