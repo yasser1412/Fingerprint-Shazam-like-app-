@@ -48,6 +48,8 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
                 sampRate, audioData = load.readAudio(audFile)
             except:
                 self.show_popup("File Not Supported", "Please Select Another File")
+                self.statusbar.showMessage("Error Uploading File")
+                logger.warning("Error Uploading File")
                 return
             
             self.audioDatas[indx] = audioData 
@@ -80,8 +82,15 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
             
         if self.flag1 == self.flag2 == True: 
             logger.info("Start Mixing 2 songs")
-            self.statusbar.showMessage("Mixing")    
-            self.mixedAudioData = (w*self.audioDatas[0] + (1.0-w)*self.audioDatas[1])
+            self.statusbar.showMessage("Mixing")
+            try:    
+                self.mixedAudioData = (w*self.audioDatas[0] + (1.0-w)*self.audioDatas[1])
+            except:
+                self.show_popup("Error Mixing", "Please Choose Another File")
+                self.statusbar.showMessage("Error Mixing")
+                logger.warning("Error Mixing")
+                return
+            
             self.mixedSongDB = spectro_features.Load_Song("Loaded Song", self.mixedAudioData, self.audioRates[0])
             logger.info("Mixing Done")
             self.statusbar.showMessage("Mixing Done")
