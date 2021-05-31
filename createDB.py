@@ -7,19 +7,20 @@ def updateDB():
     jsonData = {}
     for file in os.scandir(r"songs"):
         if (file.path.endswith(".mp3")):
-            sampRate, audioData = load.readAudio(file)
-            songName = file.path.split('\\')[-1]
-            data = spectro_features.Load_Song(songName, audioData, sampRate)
-            jsonData.update(data)
+            try:
+                sampRate, audioData = load.readAudio(file)
+                songName = file.path.split('\\')[-1]
+                data = spectro_features.Load_Song(songName, audioData, sampRate)
+                jsonData.update(data)
+            except:
+                pass
     with open("db.json", "a") as outfile:
         json.dump(jsonData, outfile, indent=4)
 
-
-def readJson(file):
-    with open(file) as jsonFile:
+def read_json(path):
+    with open(path) as jsonFile:
         data = json.load(jsonFile)
     for song in data:
         yield song, data[song]
 
-if __name__ == '__main__':
-    updateDB()
+# updateDB()
