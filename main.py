@@ -24,6 +24,8 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
         self.labels = [self.label, self.label_2]
         self.load1Btn.clicked.connect(lambda: self.loadsong(0))
         self.load2Btn.clicked.connect(lambda: self.loadsong(1))
+        self.clrBtn1.clicked.connect(lambda: self.clear_song(0))
+        self.clrBtn2.clicked.connect(lambda: self.clear_song(1))
         self.slider.valueChanged.connect(lambda: self.sliderLabel.setText(str(self.slider.value())+"%"))
         self.searchBtn.clicked.connect(lambda: self.mixer())
         self.audioDatas = [None, None]
@@ -40,10 +42,9 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
         if audFile == "":
             logger.info("loading cancelled")
             self.statusbar.showMessage("Loading cancelled")
-            pass
+            return
         else:
             logger.info("Loading data")
-            global sampRate , audioData
             try:
                 sampRate, audioData = load.readAudio(audFile)
             except:
@@ -65,7 +66,11 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
             self.flag2 = True
             
         if self.flag1 == self.flag2 == True:
-            self.slider.setEnabled(True)
+            if self.audioRates[0] != self.audioRates[1]:
+                self.show_popup("Sampling Rates Dont Match", "Please select two files having the same sampling rate")
+                logger.info("Sampling Rates Dont Match")
+            else:
+                self.slider.setEnabled(True)
     
     def mixer(self):
         w = self.slider.value()/100.0
@@ -136,6 +141,21 @@ class MainApp(QtWidgets.QMainWindow,MAIN_WINDOW):
         
         logger.info("Results Done")
         self.statusbar.showMessage("Results Done")   
+    
+    def clear_song(self, indx):
+        logger.info("Clearing Song"+str(indx+1))
+        self.statusbar.showMessage("Clearing Song"+str(indx+1))
+        if indx == 0:
+            self.flag1 = False
+        else:
+            self.flag2 = False 
+        self.audioDatas[indx] = None 
+        self.audioRates[indx] = None
+        self.slider.setEnabled(False)
+        self.labels[indx].setText("Song"+str(indx+1)+" Name")
+        
+        logger.info("Song"+str(indx+1)+" Removed")
+        self.statusbar.showMessage("Song"+str(indx+1)+" Removed")
     
     def show_popup(self, message, information):
         msg = QMessageBox()
